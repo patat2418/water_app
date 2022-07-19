@@ -1,0 +1,1154 @@
+
+############################### Main App Screens ####################
+<WelcomeScreen>:
+    GridLayout:
+        cols: 1
+        GridLayout:
+            cols: 1
+            padding: 15,15 # distance from borders
+            spacing: 20,20 # distance bettwen widgets
+
+            ScrollView:
+                Label:
+                    text: "Welcome to Patat's water App:"
+                    font_size: '18sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'center'
+
+        GridLayout:
+            cols:2
+            # size_hint: 0.2,0.2
+            padding: 10,10
+            spacing: 10, 10
+
+            # RelativeLayout:
+            # ImageButton:
+            #     source: 'pipe-icon-5.jpg'# if self.hovered else 'logout_nothover.png'
+            #     on_press: root.pipes()
+            #     # size_hint: 0.35,0.35
+            #     # pos_hint: {'center_x':0.5,'center_y':0.5}
+            
+            Button:
+                text: "Pipes"
+                background_color: 1,1,1,0
+                opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                on_press: root.pipes()
+            Button:
+                text: "Pumps"
+                background_color: 1,1,1,0
+                opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                on_press: root.pumps()
+
+<PipesScreen>:
+    GridLayout:
+        cols: 1
+        GridLayout:
+            cols: 1
+            padding: 15,15 # distance from borders
+            spacing: 20,20 # distance bettwen widgets
+
+            ScrollView:
+                Label:
+                    text: "What do you what to know about pipes?"
+                    font_size: '18sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'center'
+
+        GridLayout:
+            cols:2
+            # size_hint: 0.3,0.3
+            padding: 10,10
+            spacing: 10, 10
+
+            ScrollView:
+                Button:
+                    text: "Find the id from Velocity"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.idfromvel()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Find the id from pipe type"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.idfrompipe()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                
+            ScrollView:
+                Button:
+                    text: "Find Headloss"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.headloss()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+<PumpsScreen>:
+    GridLayout:
+        cols: 1
+        GridLayout:
+            cols: 1
+            padding: 15,15 # distance from borders
+            spacing: 20,20 # distance bettwen widgets
+            
+            ScrollView:
+                Label:
+                    text: "What do you what to know about pumps?"
+                    font_size: '20sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'center'
+            
+            
+
+        GridLayout:
+            cols:2
+            size_hint: 0.3,0.3
+            padding: 10,10
+            spacing: 10, 10
+
+            ScrollView:
+                Button:
+                    text: "Find pump power from flow_rates and heads"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pumppower()
+                    text_size: self.width, None #self.height
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Find Wet-pit volume"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.wetpit()
+                    text_size: self.width, None #self.height
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    
+            # Button:
+            #     text: "Find Headloss"
+            #     background_color: 1,1,1,0
+            #     opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+            #     color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+            #     on_press: root.headloss()
+
+<SignUpScreen>:
+    GridLayout:
+        cols: 1
+        padding: 20,20 # distance from borders
+        spacing: 20,20 # distance bettwen widgets
+        Label:
+            text: "Sign up for a space jorney!"
+        TextInput:
+            id: username
+            hint_text: "New username"
+        TextInput:
+            id: password
+            hint_text: "New password"
+        Button:
+            text: "Submit"
+            on_press: root.add_user(root.ids.username.text, root.ids.password.text)
+
+<SignUpScreenSuccess>:
+    GridLayout:
+        cols: 1
+        Label:
+            text: "Sign up successful!"
+        Button:
+            text: "Login page"
+            on_press: root.return_login()
+            
+<LoginScreenSuccess>:
+    GridLayout:
+        cols: 1
+        padding: 30,30
+        spacing: 30,30
+        RelativeLayout:
+            ImageButton:
+                source: 'logout_hover.png' if self.hovered else 'logout_nothover.png'
+                on_press: root.logout()
+                size_hint: 0.35,0.35
+                pos_hint: {'center_x':0.93,'center_y':0.8}
+        Label:
+            text: "How do you feel?"
+        TextInput:
+            id: feeling
+            hint_text: "Things to try: happy, sad, unloved..."
+        Button:
+            text: "Enlighten me"
+            on_press: root.get_quote(root.ids.feeling.text)
+        ScrollView:
+            Label:
+                id: qoute
+                text: ""
+                text_size: self.width, None #self.height 
+                size_hint_y: None
+                height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+
+################################# Pipes #############################
+
+<PipeFromVelocity>:
+    GridLayout:
+        cols: 1 
+        # rows: 5
+        GridLayout:
+            cols: 1
+            # padding: 10,10 # distance from borders
+            # spacing: 10,10 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '40dp'
+            # size_hint: 1,.5
+            
+            ScrollView:
+                Label:
+                    text: "Chose pipe diameter from max speed"
+                    font_size: '18sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    size_hint: 1,None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'top'
+        GridLayout:
+            cols: 2
+            # padding: 15,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '35dp'
+            # valign: 'center'
+            
+            ScrollView:
+                Label:
+                    text: "  Q\nm^3/hr"
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    font_size: '15sp' # sp = space-independent pixels
+                    halign: 'center'
+
+            TextInput:
+                id: flowrate
+                hint_text: "Flow rate"
+                text_size: self.width,self.height # None 
+                # size_hint_y: None
+                # height: self.texture_size[1]
+                multiline: False
+            
+            ScrollView:
+                Label:
+                    text: "max velocity\n   m/s"
+                    font_size: '15sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    halign: 'center'
+                    # size_hint: 0.3,0.3
+            
+            TextInput:
+                id: max_velocity
+                hint_text: "max velocity"
+                # size_hint: 0.3,0.3
+        
+
+            Spinner:
+                id: pipe_spinner_id
+                text: "Pipe type:"
+                values: ["Steel","PE100-16","PE100-12.5","PE100-10"]
+                # on_text: root.pipe_spinner_clicked(pipe_spinner_id.text)
+
+            Button:
+                text: "Find diameter"
+                on_press: root.find_diameter(root.ids.flowrate.text, root.ids.max_velocity.text, root.ids.pipe_spinner_id.text)
+        
+        # GridLayout:
+        #     cols: 1
+        #     padding: 15,15 # distance from borders
+        #     spacing: 10,10 # distance bettwen widgets
+        #     row_force_default: True
+        #     row_default_height: '30dp'            
+
+        #     Label:
+        #         text: "Results are:"
+        #         font_size: '15sp' # sp = space-independent pixels
+        #         # size_hint: 0.3,0.3            
+        
+        GridLayout:
+            cols: 2
+            padding: 15,15 # distance from borders
+            spacing: 5,5 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '10dp'
+            # size_hint: 0.05,None
+            # height: '30dp'
+            # pos_hint: {'left':0}
+
+            
+            Label:
+                text:''
+            
+            Label:
+                text:''
+
+            Label:
+
+                text: "Nominal diameter:"
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.2
+            Label:
+                # size_hint: 0.05,None
+                # height: '60dp'
+                id: nominal_diameter
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.2
+
+            Label:
+                text: "Inside diemeter:"
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.3,0.2
+            Label:
+                id: inside_diameter
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.2
+
+            Label:
+                text: "Real velocity:"
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.3,0.2
+            Label:
+                id: real_velocity
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.2
+
+            Label:
+                text: "Head loss:"
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.2
+            Label:
+                id: head_loss
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.3
+
+            Label:
+                text: "CW:"
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.3
+            Label:
+                id: cw
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.3
+
+            Label:
+                id: wall_tickness_txt
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.3
+            Label:
+                id: wall_tickness_value
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.5,0.3
+
+
+        GridLayout:
+            cols: 1
+            padding: 15,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '35dp'
+            # size_hint: 0.05,None
+            # height: '60dp'
+            # pos_hint: {'center_x':0}
+            Label:
+                size_hint: 0.05,None
+                height: '60dp'
+                id: error_massage
+                color: 1,0,0
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: 0.1,0.3       
+
+        GridLayout:
+            cols:2
+            # size_hint: 1,.7
+            padding: 10,10
+            spacing: 10, 10
+            row_force_default: True
+            row_default_height: '35dp'
+            
+            ScrollView:
+                Button:
+                    text: "Back to pipes menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pipes()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Back to pumps menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pumps()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+<PipeHeadLossScreen>:
+
+    GridLayout:
+        cols: 1
+        padding: 10,10 # distance from borders
+        spacing: 10,10 # distance bettwen widgets
+
+        GridLayout:
+            cols: 1
+            # padding: 10,10 # distance from borders
+            # spacing: 10,10 # distance bettwen widgets
+            # row_force_default: True
+            # row_default_height: '40dp'
+            size_hint: 1,0.20
+            ScrollView:
+                Label:
+                    text: "Head loss calculator"
+                    font_size: '18sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    size_hint: 1,None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'top'
+        GridLayout:
+            cols: 2 
+            # rows: 3
+            # padding: 0,0 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '30dp'
+            size_hint: 1,2
+
+            Label:
+                # size_hint: None,None
+                # width: '20dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "    Q\n[m^3/hr]"
+                font_size: '12sp' # sp = space-independent pixels
+
+            TextInput:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                id: flowrate
+                hint_text: "Flow rate"
+                multiline: False
+
+            Label:
+                # size_hint: None,None
+                # width: '40dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "Diameter \n     [mm]"
+                font_size: '12sp' # sp = space-independent pixels
+
+            TextInput:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                id: diameter
+                hint_text: "Diameter"
+                multiline: False
+
+            Label:
+                # size_hint: None,None
+                # width: '20dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "Length \n[meter]"
+                font_size: '12sp' # sp = space-independent pixels
+
+            TextInput:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                id: length
+                hint_text: "Length:"
+                pos_hint: {'center_x':0}
+                multiline: False
+
+            Label:
+                # size_hint: None,None
+                # width: '20dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "Cw:"
+                font_size: '12sp' # sp = space-independent pixels
+
+            TextInput:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                id: cw
+                hint_text: "Cw"
+                multiline: False
+
+            Label:
+                # size_hint: None,None
+                # width: '80dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "\u0394 Z\n[meter]"
+                font_size: '12sp' # sp = space-independent pixels
+
+            TextInput:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                id: elevation
+                hint_text: "Elevation"
+                multiline: False
+
+            Label:
+                # size_hint: None,None
+                # width: '80dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "m headloss\n [meter]"
+                font_size: '12sp' # sp = space-independent pixels
+            
+            TextInput:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                id: minor_head_loss
+                size_hint: 0.2,0.1
+                hint_text: "Minor head loss"
+                multiline: False
+                
+        GridLayout:
+            cols: 1
+            # rows:1
+            # # padding: 15,15 # distance from borders
+            spacing: 15,15 # distance bettwen widgets
+            size_hint:0.1,0.3
+            # row_force_default: True
+            # row_default_height: '30dp'
+            # # pos_hint: {'center_x':0.5}
+                    
+            Button:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                # halign: 'center'
+                size_hint: 0.2,0.1
+                pos_hint: 0.5,0.1
+                # center_x: root.width/2
+                text: "Find head loss"
+                on_press: root.pipeheadloss(root.ids.flowrate.text, root.ids.diameter.text, root.ids.length.text,root.ids.cw.text,root.ids.minor_head_loss.text,root.ids.elevation.text)
+
+            ScrollView:
+                Label:
+                    id: error_massage
+                    text: ""
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1] 
+                    color: 1,0,0
+                    halign: 'center'
+                    valign: 'center'
+                    
+
+            # StackLayout:
+        GridLayout:
+            cols: 2 
+            padding: 15,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '20dp'    #     # spacing: 20,20 # distance bettwen widgets
+
+            Label:
+                # size_hint: 0.25,None
+                # size_hint: None,None
+                # width: '40dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "A:"
+                font_size: '12sp' # sp = space-independent pixels
+            
+            Label:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                text: ""
+                font_size: '12sp'
+                id: area
+                # hint_text: "Area"
+            
+            Label:
+                # size_hint: None,None
+                # width: '60dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "V"
+                font_size: '12sp' # sp = space-independent pixels
+            
+            Label:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                
+                id: velocity
+                font_size: '12sp'
+                text: ""
+            
+            Label:
+                # size_hint: None,None
+                # width: '40dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "\u0394 Hl"
+                font_size: '12sp' # sp = space-independent pixels
+            
+            Label:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                id: major_head_loss
+                # hint_text: "Major head loss"
+                text: ""
+                font_size: '12sp'
+            
+            Label:
+                # size_hint: None,None
+                # width: '40dp'
+                # height: '40dp'
+                size_hint: 0.2,0.1
+                text: "\u0394 Ht"
+                font_size: '12sp' # sp = space-independent pixels
+            
+            Label:
+                # size_hint: None,None
+                # width: '100dp'
+                # height: '40dp'
+                text: ""
+                id: total_head_loss
+                font_size: '12sp'
+                # hint_text: "Total head loss"
+                    
+
+        GridLayout:
+            cols:2
+            size_hint: 0.5,0.5
+            padding: 10,10
+            spacing: 10, 10
+            
+            ScrollView:
+                Button:
+                    text: "Back to pipes menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pipes()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Back to pumps menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pumps()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+
+<DiameterFromPipe>:
+    GridLayout:
+        cols: 1
+        # rows: 5
+        padding: 15,15 # distance from borders
+        spacing: 20,20 # distance bettwen widgets
+        
+        GridLayout:
+            cols: 1
+            padding: 20,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            # row_force_default: True
+            # row_default_height: '40dp'
+            size_hint: 1,0.5
+            ScrollView:
+                Label:
+                    text: "Inside Diameter:"
+                    font_size: '18sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    size_hint: 1,None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'top'
+
+        GridLayout:
+            cols: 2
+            padding: 15,15 # distance from borders
+            spacing: 20,20 # distance bettwen widgets
+            # size_hint: 0.05,None
+            height: '60dp'
+            # pos_hint: {'center_x':.3}
+
+            Spinner:
+                size_hint: None,None
+                width: '100dp'
+                height: '40dp'
+                id: pipe_spinner_id
+                text: "Pipe type:"
+                values: ["Steel","PE100-16","PE100-12.5","PE100-10"]
+                on_text: root.pipe_spinner_clicked(pipe_spinner_id.text)
+
+            # Label:
+            #     text: "Nominal diameter"
+            #     text_size: 100, None #self.height 
+            #     size_hint_y: None
+            #     height: self.texture_size[1]
+            Label:
+                text: ""
+                text_size: 100, None #self.height 
+                size_hint_y: None
+                height: self.texture_size[1]
+                                
+            Spinner:
+                size_hint: None,None
+                width: '150dp'
+                height: '40dp'
+                id: nominal_dia_spinner
+                text: "Nominal diameter"
+                values: root.nominal_dia_list
+                on_text: root.find_diameter(root.ids.nominal_dia_spinner.text, root.ids.pipe_spinner_id.text)
+
+            Label:
+                id: units
+                text: ""
+                font_size: '15sp' # sp = space-independent pixels
+                size_hint: None,None
+                width: '20dp'
+                height: '20dp'
+        
+        GridLayout:
+            cols: 1
+            padding: 15,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            # size_hint: 0.05,None
+            height: '60dp'
+            pos_hint: {'center_x':.3}
+
+            GridLayout:
+                cols: 2
+                Label:
+                    id: inside_diameter
+                    text: ""                                   
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                Label:
+                    id: idunits
+                    text: ""
+                    font_size: '15sp' # sp = space-independent pixels
+                    size_hint: None,None
+                    width: '20dp'
+                    height: '20dp'
+
+        GridLayout:
+            cols:2
+            # size_hint: 0.2,0.2
+            padding: 10,10
+            spacing: 10, 10
+            
+            ScrollView:
+                Button:
+                    text: "Back to pipes menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pipes()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Back to pumps menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pumps()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+       
+
+<Test@ScrollView>:
+
+    PipeHeadLossScreen:
+    DiameterFromPipe:
+
+<WidgetScreen>:
+
+    GridLayout:
+        cols:3
+        rows: 3
+        
+            # cols: 3
+            # size: root.width, root.height 
+            # rows: 2
+
+        PipeHeadLossScreen:
+        PipeFromVelocity:
+        DiameterFromPipe:
+            # GridLayout:
+
+################################# Pumps #############################
+
+<PumpPowerWidget>:
+
+    GridLayout:
+        cols: 1
+        # padding: 15,15 # distance from borders
+        spacing: 10,10
+
+        GridLayout:
+            cols: 1
+            padding: 20,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            # row_force_default: True
+            # row_default_height: '40dp'
+            size_hint: 1,0.30
+            ScrollView:
+                Label:
+                    text: "Pump power calculator"
+                    font_size: '18sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    size_hint: 1,None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'top'
+
+        GridLayout:
+            cols: 2
+            padding: 20,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            row_force_default: True
+            row_default_height: '40dp'
+            # size_hint: 1,0.25
+
+            Label:
+                size_hint: 0.2,0.1
+                # width: 
+                # height: '40dp'
+                text: "    Q\n[m^3/hr]"
+                font_size: '15sp' # sp = space-independent pixels
+
+            TextInput:
+                id: flow_rate
+                size_hint: 0.2,0.1
+                # width: '100dp'
+                # height: '40dp'
+                id: flow_rate
+                hint_text: "Flow rate"
+                multiline: False
+
+            Label:
+                size_hint: 0.2,0.1
+                # width: '40dp'
+                # height: '40dp'
+                text: "Head\n [m]"
+                font_size: '15sp' # sp = space-independent pixels
+
+            TextInput:
+
+                size_hint: 0.2,0.1
+                # width: '100dp'
+                # height: '40dp'
+                id: pump_head
+                hint_text: "Pump head"
+                multiline: False
+
+            Label:
+                size_hint: 0.2,0.1
+                # width: '40dp'
+                # height: '40dp'
+                text: "Efficensy\n [%]"
+                font_size: '15sp' # sp = space-independent pixels
+
+            TextInput:
+
+                size_hint: 0.2,0.1
+                # width: '100dp'
+                # height: '40dp'
+                id: pump_eff
+                hint_text: "Pump eff"
+                multiline: False
+
+        GridLayout:
+            cols:1
+            row_force_default: True
+            row_default_height: '40dp'
+            # pos: root.x +20, root.top - self.height - 20
+            size_hint: 1,0.25
+
+            Button:
+                size_hint: 0.2,0.1
+                # width: '100dp'
+                # height: '40dp'
+                # center_x: root.width/2
+                text: "Find Power"
+                on_press: root.pumpower(root.ids.flow_rate.text, root.ids.pump_head.text, root.ids.pump_eff.text)
+
+        GridLayout:
+            cols:1
+            size_hint: 1,0.25
+            
+            ScrollView:
+                Label:
+                    # size_hint: 0.2,0.1
+                    id: pump_power
+                    text: ""
+                    font_size: '15sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height
+                    size_hint_y: None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'center'
+
+
+        GridLayout:
+            cols:2
+            # size_hint: 0.2,0.2
+            padding: 10,10
+            spacing: 10, 10
+            
+            ScrollView:
+                Button:
+                    text: "Back to pipes menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pipes()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Back to pumps menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pumps()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+
+
+<WetPitWidget>:
+    GridLayout:
+        cols: 1
+        padding: 15,15
+        # spacing: 10,10 # distance bettwen widgets
+
+        ScrollView:
+            Label:
+                text: "Wet pit volume calculator"
+                font_size: '18sp' # sp = space-independent pixels
+                text_size: self.width, None #self.height 
+                # size_hint_y: None
+                size_hint: 1,None
+                height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                halign: 'center'
+                valign: 'center'
+    
+        GridLayout:
+        
+            cols: 2
+            padding: 15,15 # distance from borders
+            spacing: 10,10 # distance bettwen widgets
+            # row_force_default: True
+            # row_default_height: '40dp'
+            # size_hint: 1,0.25
+
+            Label:
+                size_hint: 0.2,0.1
+                # width: 
+                # height: '40dp'
+                text: "    Q\n[m^3/hr]"
+                font_size: '15sp' # sp = space-independent pixels
+
+            TextInput:
+                id: flow_rate
+                size_hint: 0.2,0.1
+                # width: '100dp'
+                # height: '40dp'
+                id: flow_rate
+                hint_text: "Flow rate"
+                multiline: False
+
+            
+            Label:
+                size_hint: 0.2,0.1
+                text: "Max operations\nper hour"
+                font_size: '15sp' # sp = space-independent pixels
+                halign: 'center'
+                # text_size: self.width, None #self.height 
+                # size_hint_y: None
+                # height: self.texture_size[1]
+                
+            TextInput:
+                size_hint: 0.2,0.1
+                id: starts_num
+                hint_text: "operations"
+                multiline: False
+
+        GridLayout:
+            cols:1
+            row_force_default: True
+            row_default_height: '40dp'
+            # pos: root.x +20, root.top - self.height - 20
+            # size_hint: 1,0.25
+
+            Button:
+                size_hint: 0.2,0.1
+                # width: '100dp'
+                # height: '40dp'
+                # center_x: root.width/2
+                text: "Find volume"
+                on_press: root.wetpit_volume(root.ids.flow_rate.text, root.ids.starts_num.text)
+
+        GridLayout:
+            cols:1
+            # size_hint: 1,0.25
+            
+            
+            ScrollView:
+                Label:
+                    # pos: root.x +20, root.top - self.height - 20
+                    # size_hint: 0.2,0.1
+                    id: volume
+                    # width: '40dp'
+                    # height: '40dp'
+                    text: ""
+                    font_size: '15sp' # sp = space-independent pixels
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1] # Dinamic: texture_size - tyupple the first is width and the second is height
+                    halign: 'center'
+                    valign: 'center'
+
+        GridLayout:
+            cols:2
+            # size_hint: 0.2,0.2
+            padding: 10,10
+            spacing: 10, 10
+            
+            ScrollView:
+                Button:
+                    text: "Back to pipes menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pipes()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+            ScrollView:
+                Button:
+                    text: "Back to pumps menu"
+                    background_color: 1,1,1,0
+                    opacity: 1 if self.state == 'normal' else 0.5 # self refer to the button widget
+                    color: 0.1, 0.7, 1, 1 #10% Red, 70% Green, 100% Blue , 100% not transparent
+                    on_press: root.pumps()
+                    text_size: self.width, None #self.height 
+                    size_hint_y: None
+                    height: self.texture_size[1]
+       
+
+################################# Pipes #############################
+
+
+
+<RootWidget>:
+    WelcomeScreen:
+        name: 'welcome_screen'
+    
+    PipesScreen:
+        name: 'pipes_screen'
+
+    PumpsScreen:
+        name: 'pumps_screen'
+    
+    PipeFromVelocity:
+        name: "pipe_from_velocity"
+    WidgetScreen:
+        name: "widget_screen"
+    
+    # PumpPowerScreen:
+    #     name: "pump_power_screen"
+    PumpPowerWidget:
+        name: "pump_power_widget"
+    WetPitWidget:
+        name: 'wetpitwidget'
+    # Test:
+    #     name: "test"
+    PipeHeadLossScreen:
+        name: "pipe_head_loss_screen"
+    DiameterFromPipe:
+        name: "diameter_from_pipe"
+    # LoginScreen:
+    #     name: "login_screen"
+    SignUpScreen:
+        name: "sign_up_screen"
+    SignUpScreenSuccess:
+        name: "sign_up_screen_success"
+    LoginScreenSuccess:
+        name: "login_screen_success"
