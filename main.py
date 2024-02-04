@@ -48,6 +48,8 @@ class AddElemntsWidget(Screen):
     nominal_dia_list = ["Please chosse pipe type:"]
 
     def pipe_spinner_clicked(self, value):
+
+
         # if value == 'Steel':
         #     self.ids.units.text = '"\n'
         # else:
