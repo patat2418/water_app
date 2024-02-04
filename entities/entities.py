@@ -1,47 +1,52 @@
-from ast import operator
+import sys
 import random
 import math
-# from typing_extensions import Self
 import pandas as pd
 import numpy as np
 # import matplotlib.pyplot as plt
 # import plotly.graph_objects as go
-from sympy import symbols, solve
+
+import os
+sys.path.insert(1,os.getcwd())
 from utils import eq
+
+pipes_type_dict = pd.read_excel('data\\info\\pipes.xlsx',sheet_name=None)
+pipes_type_lower = [x.lower() for x in pipes_type_dict.keys()]
 
 class Pipe:
     
-    def __init__ (self,pipetype="PE100-16",nominal_dia=0,inside_dia=0,length=1,cw=130,minor_headloss=0,major_headloss=0,static_head=0,total_headloss=0,flow_rate=0):
+    def __init__ (self,pipetype="PE100-16",nominal_dia=0,inside_dia=0.0,length=1,cw=130,minor_headloss=0.0,major_headloss=0.0,static_head=0.0,total_headloss=0.0,flow_rate=0.0):
         
-        self.pipetype = pipetype # List of pipe type: ["Steel","PE100-16","PE100-12.5","PE100-10"]
-        self.inside_dia = inside_dia # Inside diameter
-        self.nominal_dia = nominal_dia
-        self.length = length # Pipe length
-        self.cw = cw
-        self.minor_headloss = minor_headloss
-        self.major_headloss = major_headloss
-        self.static_head = static_head
-        self.total_headloss = total_headloss
-        self.flow_rate = flow_rate
-        self.pipe_table = pd.read_excel('pipes.xlsx',sheet_name=self.pipetype).fillna(value=0)
+        self.pipetype:str = pipetype # List of pipe type: ["Steel","PE100-16","PE100-12.5","PE100-10"]
+        self.inside_dia:float = inside_dia # Inside diameter
+        self.nominal_dia:float = nominal_dia
+        self.length:float = length # Pipe length
+        self.cw:int = cw
+        self.minor_headloss:float = minor_headloss
+        self.major_headloss:float = major_headloss
+        self.static_head:float = static_head
+        self.total_headloss:float = total_headloss
+        self.flow_rate:float = flow_rate
+        self.pipe_table = pipes_type_dict[self.pipetype].fillna(value=0)
         # print(self.pipe_table.head())
 
 
-    def inside_diameter(self,area):
+    def inside_diameter(self,area:float):
         return (math.sqrt((4*area)/math.pi))
     
     def area (self):
-        return eq.area(self.inside_dia)
+        return eq.area(float(self.inside_dia))
     
     def area_from_velocity (self,velocity):
-        return (self.flow_rate/3600)/(velocity)
+        # print(f'HELLO THERE {type(velocity)}\n\n\n\n{velocity}\n\n\n\n')
+        return (float(self.flow_rate)/3600)/float(velocity)
         
     def velocity (self):
-        return round((self.flow_rate/3600)/(self.area()),2)
+        print(float(self.flow_rate))
+        return (float(self.flow_rate)/3600)/(self.area())
 
     def flow_rate_calc(self,velocity=0):
-        if velocity != 0:
-            flow = velocity*self.area()*3600
+        flow = float(velocity)*self.area()*3600
         return flow
 
     def major_head_loss(self):
@@ -53,27 +58,27 @@ class Pipe:
         pass
 
     def total_head_loss (self):
-        velocity_energy = (float(self.velocity())**2)/(2*9.18)
-
+        velocity_energy = eq.velocity_energy(float(self.velocity()))
         return float(self.static_head)+(velocity_energy+float(self.major_head_loss())+float(self.minor_headloss))
 
-    def select_pipe_dia_from_velocity(self,des_vel):
+    def select_pipe_dia_from_velocity(self,design_velocity):
         
-        if des_vel == 0:
-            return 
+        # print(f'HELLO HERE {type(design_velocity)}\n\n\n\n{design_velocity}\n\n\n\n')
 
-        dia1 = self.inside_diameter(self.area_from_velocity(des_vel))*1000
-        # print (dia1)
-        # print(self.pipetype)
+        if design_velocity <= 0:
+            print('select_pipe_dia_from_velocity(self,des_vel) EROOR\n  des_vel<=0  ')
+            return 
+        area = self.area_from_velocity(design_velocity)
+        dia1 = self.inside_diameter(area)*1000
+
         if self.pipetype == "Steel":
-            # print(self.pipe_table.head())
             pd.to_numeric(self.pipe_table['Id'],errors='coerce',downcast='float')
             self.pipe_table['Id'][0]=0
             result_inside_diameter = self.pipe_table[self.pipe_table['Id']-dia1 > 0]['Id'].min()
             nominal_diameter = self.pipe_table[self.pipe_table['Id']==result_inside_diameter]['ND']
-            # wall_thickness = self.pipe_table[self.pipe_table['Id']==result_inside_diameter]['wall thickness']
             min_wt = self.pipe_table[self.pipe_table['ND']==nominal_diameter.values[0]]['wall thickness'].min()
             inside_diameter = self.pipe_table[(self.pipe_table['wall thickness']==min_wt) & (self.pipe_table['ND']==nominal_diameter.values[0])]['Id'].values[0]
+
             return (nominal_diameter.values[0], inside_diameter,min_wt) # Return a tupple of (ND of the pipe in inche , id in mm, wall thickness in mm)
 
         else:
@@ -81,19 +86,23 @@ class Pipe:
             result_inside_diameter = self.pipe_table[self.pipe_table['Id']-dia1 > 0]['Id'].min()
             nominal_diameter = self.pipe_table[self.pipe_table['Id']==result_inside_diameter]['ND']
             # wall_thickness = pipe_table[pipe_table['Id']==result_inside_diamter]['wall thickness']
+
             return (nominal_diameter.values[0], result_inside_diameter,0)
             
     def inside_dia_from_nominal (self, nd):
-        self.pipe_table = pd.read_excel('pipes.xlsx',sheet_name=self.pipetype)
+
+        # self.pipe_table = pd.read_excel('data\\info\\pipes.xlsx',sheet_name=self.pipetype)
         if self.pipetype == "Steel":
             pd.to_numeric(self.pipe_table['Id'],errors='coerce',downcast='float')
             self.pipe_table['Id'][0]=0
             min_wt = self.pipe_table[self.pipe_table['ND']==nd]['wall thickness'].min()
             inside_diameter = self.pipe_table[(self.pipe_table['wall thickness']==min_wt) & (self.pipe_table['ND']==nd)]['Id'].values[0]
+
             return inside_diameter
         else:
             pd.to_numeric(self.pipe_table['Id'],errors='coerce',downcast='float')
             inside_diameter = self.pipe_table[self.pipe_table['ND']==nd]['Id']
+
             return inside_diameter.values[0]
     
 
@@ -102,50 +111,83 @@ class Pipe:
         # print(wall_thickness_list)
         return wall_thickness_list
 
-    def pipe_diameter_table (self):
-        self.pipe_table = pd.read_excel('pipes.xlsx',sheet_name=self.pipetype).fillna(value=0)
-        if self.pipetype == 'Steel':
-            a = list(self.pipe_table['ND'].drop_duplicates().values)
-            b = [str(x) for x in a]
-            return b
-        else:
-            # print(self.pipe_table[(self.pipe_table['Id']!= 0) or ()])
-            a = list(self.pipe_table[self.pipe_table['Id']!= 0]['ND'].values)
-            b = [str(x) for x in a]
-            return b
+    # def pipe_diameter_table (self, pipetype=''):
+        
+    #     if pipetype == '':
+    #         pipetype = self.pipetype
+    #     # self.pipe_table = pd.read_excel('data\\info\\pipes.xlsx',sheet_name=self.pipetype).fillna(value=0)
+    #     # if self.pipetype == 'Steel':
+    #     #     a = list(self.pipe_table['ND'].drop_duplicates().values)
+    #     #     b = [str(x) for x in a]
+    #     #     return b
+    #     # else:
+    #     #     a = list(self.pipe_table[self.pipe_table['Id']!= 0]['ND'].values)
+    #     #     b = [str(x) for x in a]
+    #     #     return b
+    #     self.pipe_table = pipes_type_dict[self.pipetype].fillna(value=0)
+    #     if self.pipetype == 'Steel':
+    #         a = list(self.pipe_table['ND'].drop_duplicates().values)
+    #         b = [str(x) for x in a]
+    #         return b
+    #     else:
+    #         a = list(self.pipe_table[self.pipe_table['Id']!= 0]['ND'].values)
+    #         b = [str(x) for x in a]
+    #         return b
+
 
 class Channel:
-    def __init__ (self, manning_coefficient = 0.035 ,channel_type='triangle', channel_depth=1, flow_rate = 0, channel_slope=0):
+    def __init__ (self, manning_coefficient = 0.035 , channel_depth = 0.0, flow_rate = 0.0, channel_slope=0.0,
+                    bank_slope = 3, bottom_width= 0.0, max_water_depth = False): #channel_type='triangle',
+        
         self.manning_coefficient = manning_coefficient
-        self.channel_type = channel_type # pipe,triangle,trapezoid,rectangular
+        # self.channel_type = channel_type # pipe,triangle,trapezoid,rectangular
         self.channel_depth = channel_depth
         self.flow_rate = flow_rate
         self.channel_slope = channel_slope
-        if self.channel_type == 'triangle':
-            self.bottom_width = 0            
-        if (self.channel_type == 'rectangular') or (self.channel_type == 'pipe'):
-            self.bank_slope = 0
-        else:
-            self.bank_slope = float(input('Please input channel bank slope: '))
+        self.bank_slope = bank_slope
+        self.bottom_width = bottom_width
+        self.max_water_depth = max_water_depth
         
         self.top_width = self.bottom_width + (channel_depth * self.bank_slope * 2)
-
-        self.water_depth,self.cross_sectional_area,self.wetted_perimeter = eq.water_level_from_manning (self.flow_rate,self.bottom_width,self.bank_slope,self.channel_slope,self.manning_coefficient)
+        
+        self.water_depth,self.cross_sectional_area,self.wetted_perimeter,self.hydraulic_radius, self.velocity = eq.manning_eq_water_level_from_flow(self.flow_rate,self.bottom_width,self.bank_slope,self.channel_slope,self.manning_coefficient)
+        
+        if self.max_water_depth:
+            pass
+        # if (self.max_water_high < self.water_depth) & (self.max_water_high != False):
+        #     print('Channel Geometry not good for that water flow')
 
 class Pump:
     
-    def __init__ (self,operation_points=pd.DataFrame(),duty_point=(0,0),frequency_converters=False, frequency=50):
+    def __init__ (self,operation_points=pd.DataFrame(),rated_flow=0, rated_head=0,frequency_converters=False, frequency=50):
         self.operation_points =operation_points
-        self.duty_point = duty_point
+        self.rated_flow = rated_flow
+        self.rated_head = rated_head
         self.frequency_converters=frequency_converters
         self.frequency=frequency
 
     def power(self, flow_rate,head,eff=1):
+
+        # '''
+        # if the flow value is less than 4 
+        # it assuming that the units are m^3/second. 
+        # if it's more then that the units are in m^3/hour
+        # '''
+
+        # if flow_rate > 4:
+        #     unit_convert = 3600
+        # else:
+        #     unit_convert = 3.6
+
+        # if eff > 1 :
+        #     eff /= 1000
+
         return (((flow_rate/3.6)*head)/102)/eff
 
     def min_wet_pit(self,flow_rate,starts_num):
+        
         cycle_time = 60/starts_num/60
-        print(cycle_time)
+        # print(cycle_time)
         return (flow_rate*cycle_time/4)
 
     # def pump_chart(self):
@@ -168,46 +210,6 @@ class Pump:
         # plt.show()   
         return flow_rate_list, head_list
     
-    # def system_chart(self,pipe=Pipe(),max_flow=1000):
-        
-    #     flow_rate_list, head_list = self.tdh(pipe)
-    #     x = symbols('x')
-
-    #     op_eq = np.polyfit(self.operation_points['Flow'],self.operation_points['Head'],2)
-    #     tdh_eq = np.polyfit(flow_rate_list,head_list,2)
-    #     eq = (op_eq[0]-tdh_eq[0])*(x**2)+(op_eq[1]-tdh_eq[1])*x+(op_eq[2]-tdh_eq[2])
-    #     operation_point_head = solve(eq)
-    #     operation_point_flow = solve(tdh_eq[0])*(x**2)+tdh_eq[1]*x+tdh_eq[2]-operation_point_head
-    #     # self.operation_points['Flow'].append(operation_point)
-    #     # self.operation_points['Head'].append()
-    #     fig = go.Figure()
-    #     fig.layout.title = 'Pump and tdh graph'
-    #     fig.add_trace(
-    #         go.Scatter(
-    #             x=self.operation_points['Flow'],
-    #             y=self.operation_points['Head'],
-    #             name='Pump corve',
-    #             # trendline="ols"
-    #         ))
-
-    #     fig.add_trace(
-    #         go.Scatter(
-    #             x=flow_rate_list, 
-    #             y=head_list,
-    #             name='tdh',
-    #             # trendline="ols"
-    #         ))
-        
-    #             fig.add_trace(
-    #         go.Scatter(
-    #             x=flow_rate_list, 
-    #             y=head_list,
-    #             name='tdh',
-    #         ))
-
-    #     fig.show()
-
-
 
 class Network:
 
@@ -240,9 +242,21 @@ def parallel_pipes(pipe1=Pipe(), pipe2=Pipe(), total_flow=1000):
     return pipe1,pipe2
 
 
-# pipe1 = Pipe(inside_dia=1,length=100,minor_headloss=0,static_head=50,flow_rate=430,cw=110)
-# pipe2 = Pipe(inside_dia=0.253,length=35,minor_headloss=0,static_head=0,flow_rate=625,cw=110)
+class CounsumerJunction:
+    
+    def __init__ (self,flow=0,min_pressure=0):
+        self.flow = flow
+        self.min_pressure = min_pressure
 
+# a1 = Channel(manning_coefficient=0.035,flow_rate=700,bank_slope=2,channel_slope=0.004,bottom_width=0)
+
+
+# print(a1.water_depth, '\n', a1.velocity)
+
+
+# pipe1 = Pipe(pipetype='PE100-16',inside_dia=1,length=100,minor_headloss=0,static_head=50,flow_rate=430,cw=110)
+# pipe2 = Pipe(inside_dia=0.253,length=35,minor_headloss=0,static_head=0,flow_rate=625,cw=110)
+# print(pipe1.inside_dia_from_nominal(400))
 # points = {'Flow':[40,45,50,55,60,65,70,75,80,85,90,95,100,105],
 #  'Head' : [110,110,109,108,107,106,104,101,99,95,92,90,79.4,77]}
 # op = pd.DataFrame(points)
@@ -312,5 +326,5 @@ def parallel_pipes(pipe1=Pipe(), pipe2=Pipe(), total_flow=1000):
 # plt.plot(x,y)
 # plt.show()
 
-channel1 = Channel(flow_rate=7200,channel_slope=0.05)
-print(channel1.cross_sectional_area)
+# channel1 = Channel(flow_rate=7200,channel_slope=0.05)
+# print(channel1.cross_sectional_area)
