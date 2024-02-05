@@ -24,11 +24,21 @@ def area(inside_dia:float) -> float:
     return(area)
 
 def headloss(flow_rate:float,cw:int,inside_dia:float,length:float) -> float:
+    """return the major head loss or friction loss 
 
+    Args:
+        flow_rate (float): the flowrate in m^3/hr
+        cw (int): roughness coefficient
+        inside_dia (float): if the inside_dia value is bigger than 10 
+                            it assuming that the units are in mm.
+                            if it's less then that the units are in m
+        length (float): the length of the pipe in m
+
+    Returns:
+        float: _description_
+    """
     '''
-    if the inside_dia value is bigger than 10 
-    it assuming that the units are in mm.
-    if it's less then that the units are in m
+    
     '''
 
     if inside_dia > 10 :
@@ -41,6 +51,14 @@ def headloss(flow_rate:float,cw:int,inside_dia:float,length:float) -> float:
     return headloss
 
 def velocity_energy (velocity:float) ->float:
+    """return the velocity energy of the water from it's velocity
+
+    Args:
+        velocity (float): velocity in m/s
+
+    Returns:
+        velocity_energy(float): velocity energy in m
+    """
     velocity_energy = (float(velocity)**2)/(2*global_consts.g)
     return velocity_energy
 

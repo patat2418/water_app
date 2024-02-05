@@ -15,6 +15,8 @@ pipes_type_lower = [x.lower() for x in pipes_type_dict.keys()]
 
 class Pipe:
     
+    """ Pipe class -> have all the pipes attributes and methods
+    """
     def __init__ (self,pipetype="PE100-16",nominal_dia=0,inside_dia=0.0,length=1,cw=130,minor_headloss=0.0,major_headloss=0.0,static_head=0.0,total_headloss=0.0,flow_rate=0.0):
         
         self.pipetype:str = pipetype # List of pipe type: ["Steel","PE100-16","PE100-12.5","PE100-10"]
@@ -32,25 +34,62 @@ class Pipe:
 
 
     def inside_diameter(self,area:float):
+        """Find the inner diameter of a pipe from it's area
+
+        Args:
+            area (float): Area of the pipe (in m^2)
+
+        Returns:
+            inner_diameter(float): id in meter
+        """
         return (math.sqrt((4*area)/math.pi))
     
     def area (self):
+        """return the area of the pipe from it's inner diameter
+
+        Returns:
+            area(float): area in m^2
+        """
         return eq.area(float(self.inside_dia))
     
-    def area_from_velocity (self,velocity):
-        # print(f'HELLO THERE {type(velocity)}\n\n\n\n{velocity}\n\n\n\n')
+    def area_from_velocity (self,velocity:float):
+        """return the area of a pipe needed to pass given flowrate(m^3/h) (from self) in a given speed
+
+        Args:
+            velocity (float): the velocity in m/s
+
+        Returns:
+            area(float): area in m^2
+        """
         return (float(self.flow_rate)/3600)/float(velocity)
         
     def velocity (self):
+        """return the velocity of given flowrate(m^3/h) and pipe area (in m^2) (from self)
+
+        Returns:
+            velocity(float): the vleocity in m/s
+        """
         print(float(self.flow_rate))
         return (float(self.flow_rate)/3600)/(self.area())
 
     def flow_rate_calc(self,velocity=0):
+        """retrun flowrate (in m^3/hr) from velocity and pipe area (from self)
+
+        Args:
+            velocity (float, optional): the velocity in m/s. Defaults to 0.
+
+        Returns:
+            flow (float): the flowrate in m^3/hr
+        """
         flow = float(velocity)*self.area()*3600
         return flow
 
     def major_head_loss(self):
+        """call a function that return the major head loss or friction loss and return the value 
 
+        Returns:
+            headloss (float): the friction loss in m
+        """
         headloss = eq.headloss(self.flow_rate,self.cw,self.inside_dia,self.length)
         return headloss
 
