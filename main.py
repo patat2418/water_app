@@ -68,7 +68,6 @@ class AddElemntsWidget(Screen):
             error_message += "Pipe type is not supported! "
         elif nominal_diameter not in self.ids.nominal_dia_spinner.values:
             error_message += "Nominal diameter is not supported! "
-        
         error_message += usf.is_float_message(string=consumption, name='Consumption')
         error_message += usf.is_float_message(string=min_pressure, name='Min pressure')
         if error_message != "":
@@ -97,7 +96,6 @@ class AddElemntsWidget(Screen):
         autocad_functions.make_a_pipe_from_app(pipetype,nominal_diameter,consumption,min_pressure)
 
     def draw_a_pipe(self,pipetype,nominal_diameter, start_elv,end_elv,consumption='0',min_pressure='0'):
-
         if not self.pipe_validation(pipetype,nominal_diameter,consumption,min_pressure):
             return
         

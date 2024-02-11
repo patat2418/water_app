@@ -167,11 +167,11 @@
                     # height: '20dp'
                     size_hint: 0.2,None
                     height: '25dp'
-                    on_press: root.create_a_pipe(root.ids.pipe_spinner.text, root.ids.nominal_dia_spinner.text, root.ids.consumption.text)
+                    on_press: root.create_a_pipe(root.ids.pipe_spinner.text, root.ids.nominal_dia_spinner.text, root.ids.consumption.text,root.ids.minimum_pressure.text)
                 
                 Button:
                     text: "Draw a Pipe"
-                    on_press: root.draw_a_pipe(root.ids.pipe_spinner.text, root.ids.nominal_dia_spinner.text, root.ids.consumption.text, root.ids.start_z.text, root.ids.end_z.text)
+                    on_press: root.draw_a_pipe(root.ids.pipe_spinner.text, root.ids.nominal_dia_spinner.text, root.ids.start_z.text, root.ids.end_z.text, root.ids.consumption.text,root.ids.minimum_pressure.text)
             
             GridLayout:
                 cols:1
