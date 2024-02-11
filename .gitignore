@@ -170,3 +170,8 @@ cython_debug/
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+
+
+#AutoCAD
+
+*.dwl
