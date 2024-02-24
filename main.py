@@ -124,7 +124,8 @@ class NetworkWidget(Screen):
         pipes_table, pumps_table, channels_table = autocad_analyzing.dwg_objects_sorting()
         autocad_analyzing.is_pipe_conected(pipes_table,pumps_table)
         if not pipes_table.empty: 
-            pipes_network_sytems.simple_network(pipes_table,pumps_table)
+            pipes_network_sytems.branched_network(pipes_table,pumps_table)
+            # pipes_network_sytems.simple_network(pipes_table,pumps_table)
         autocad_analyzing.add_text_to_dwg(pipes_table,pumps_table, channels_table)
         
         # self.make_a_sec()
@@ -140,7 +141,7 @@ class NetworkWidget(Screen):
         try:
             eco_pipes_table, eco_pumps_table, channels_table = autocad_analyzing.dwg_objects_sorting()
             autocad_analyzing.is_pipe_conected(eco_pipes_table,eco_pumps_table)
-            pipes_network_sytems.simple_network(eco_pipes_table,eco_pumps_table) #Need diffrent func
+            pipes_network_sytems.branched_network(eco_pipes_table,eco_pumps_table) #Need diffrent func
             pipes_network_sytems.pipes_from_flow_and_velocity (eco_pipes_table, eco_pumps_table, float(velocity))
             autocad_analyzing.add_text_to_dwg(eco_pipes_table,eco_pumps_table,channels_table)
         except Exception as e:

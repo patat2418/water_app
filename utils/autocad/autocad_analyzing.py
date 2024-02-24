@@ -9,7 +9,7 @@ sys.path.insert(1,os.getcwd())
 from utils import eq
 from utils import useful_functions as uf
 from entities import entities
-from utils.autocad import autocad_functions
+from utils.autocad import pipes_network_sytems
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -410,8 +410,11 @@ def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channel
     prev_pipe = pipes_table[pipes_table['start with'] == pump_name]['start with'].values[0]
     current_pipe = pipes_table[pipes_table['start with'] == pump_name]['pipe #'].values[0]
     next_pipe = pipes_table[pipes_table['start with'] == pump_name]['end with'].values[0]
+    branches_df = pipes_network_sytems.make_branches_df(pipes_table)
     
     for i in range(len(pipes_table)): #range(len(pipes_table))
+
+        
 
         ####### Vertex text #####
         p1 = APoint(pipes_table.loc[current_pipe,'start']) # p1 = APoint(pipes_table['start'][i])
@@ -420,6 +423,7 @@ def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channel
             pressure = pumps_table.loc[pump_name,"head"]
             min_pressure = 0
             consumption = 0
+        
         else:
             pressure = pipes_table.loc[prev_pipe,"Pressure at end of pipe"]
             min_pressure = pipes_table.loc[prev_pipe,"minimum pressure required"]
@@ -479,11 +483,19 @@ def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channel
 #         input("press any key: ")
         prev_pipe = current_pipe
         current_pipe = next_pipe
+        # try: 
+            
+        #     next_pipe = (pipes_table[pipes_table['pipe #'] == current_pipe]['end with'].values[0])
+        # except:
+        #     next_pipe = ''
         try: 
-            next_pipe = (pipes_table[pipes_table['pipe #'] == current_pipe]['end with'].values[0])
-        except:
+            if (current_pipe in branches_df.index) or (pipes_table['end with'][current_pipe] == ""):
+                next_pipe = pipes_network_sytems.next_branches_not_tested(branches_df)
+            else:
+                next_pipe = (pipes_table[pipes_table['pipe #'] == current_pipe]['end with'].values[0])
+        except Exception as e:
+            print("The error is: ",e)
             next_pipe = ''
-
 
         p2 = APoint(pipes_table['end'][i])
         p3 = APoint(uf.midpoint_betwen_to_points(p2,p1))
@@ -514,6 +526,7 @@ def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channel
         p3.y -= 4
         flow = f"Total head loss: {round(pipes_table['total head loss'][i],2)} m"
         text = acad.model.Addtext(flow,p3,2.5)
+    pipes_network_sytems.reset_branches_tested_values(branches_df)
 
 def make_a_sec_grid (pipes_table, x_steps, y_steps):
     
@@ -650,6 +663,7 @@ def draw_pipe_sec ( pipes_table,min_y,max_y):
 
 if __name__=='__main__':
 
+    from utils.autocad import pipes_network_sytems
 
     pipes_table = pd.DataFrame()
     pumps_table = pd.DataFrame()
@@ -658,6 +672,60 @@ if __name__=='__main__':
     pipes_table, pumps_table, channels_table = dwg_objects_sorting()
     is_pipe_conected(pipes_table,pumps_table)
 
+    ###### pump restart
+    pump_number = pumps_table['pump #'][0]
+    pump_flow = pipes_table['consumption'].sum()  
+    pumps_table['flow'][pump_number] = pump_flow
+    pump1 = entities.Pump(rated_flow=pump_flow)
+
+    
+    ### Pipes data ###
+    
+    junctions_list= list(pipes_table[pipes_table['end with'].str.contains(',', na=False)]['pipe #'])
+        
+    for junction in junctions_list:
+        
+        pass
+
+    previous_pipe_number = 0
+
+    
+
+    for pipe in range(0,len(pipes_table.index)):
+
+        if pipe == 0:
+            new_pipe_number = pipes_table[pipes_table['start with'] == pump_number]['end with'].index[0]
+            flow_rate = pump_flow
+ 
+        else:
+            new_pipe_number = pipes_table['end with'][previous_pipe_number]
+            flow_in = float(pipes_table['flow'][previous_pipe_number])
+            consumption = float(pipes_table['consumption'][previous_pipe_number])
+            flow_rate = flow_in - consumption
+
+        # if new_pipe_number
+
+        pipetype = pipes_table['pipe type'][new_pipe_number]
+        nominal_dia = pipes_table['nominal dia'][new_pipe_number]
+        inside_dia = pipes_table['id (mm)'][new_pipe_number]
+        length = pipes_table['length (m)'][new_pipe_number]
+        static_head = pipes_table['static head (endZ-startZ)'][new_pipe_number]
+    
+        pipe1 = entities.Pipe(pipetype=pipetype,nominal_dia=nominal_dia,inside_dia=inside_dia,length=length,static_head=static_head,flow_rate=flow_rate)
+
+        velocity = pipe1.velocity()
+        head_loss = pipe1.major_head_loss()
+        total_headloss = pipe1.total_head_loss()
+
+        pipes_table['flow'][new_pipe_number] = flow_rate 
+        pipes_table['velocity'][new_pipe_number] = velocity
+        pipes_table['head loss'][new_pipe_number] = head_loss
+        pipes_table['total head loss'][new_pipe_number] = total_headloss
+
+        previous_pipe_number = new_pipe_number
+    
+    minimum_pressure = pipes_network_sytems.add_pressure_at_end_of_pipe(pipes_table)
+
     with pd.ExcelWriter('data\\outputs\\acad-pipelines.xlsx') as writer:
         pipes_table.to_excel(writer,sheet_name='Pipes',index=False)
         pumps_table.to_excel(writer,sheet_name='Pumps',index=False)
@@ -665,7 +733,16 @@ if __name__=='__main__':
     os.startfile('data\\outputs\\acad-pipelines.xlsx')    
 
 
-# acad = Autocad(create_if_not_exists=True)
-# pipes_table, pumps_table = dwg_objects_sorting(acad=acad)
 
-# print(pumps_table)
+# if __name__=='__main__':
+#     pipes_table = pd.DataFrame()
+#     pumps_table = pd.DataFrame()
+#     channels_table = pd.DataFrame()
+#     eco_pipes_table = pipes_table.copy()
+#     eco_pumps_table = pumps_table.copy()
+
+#     acad = Autocad(create_if_not_exists=True)
+#     pipes_table, pumps_table = dwg_objects_sorting(acad=acad)
+
+
+# # print(pumps_table)
