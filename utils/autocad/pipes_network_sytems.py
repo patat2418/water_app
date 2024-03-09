@@ -221,6 +221,7 @@ def branched_network(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame):
     pumps_table['flow'][pump_number] = pump_flow
     pump1 = entities.Pump(rated_flow=pump_flow)
 
+    ###  Pipes data  ###
     previous_pipe_number = 0
 
     for pipe in range(0,len(pipes_table.index)):
