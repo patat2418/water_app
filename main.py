@@ -122,9 +122,9 @@ class NetworkWidget(Screen):
 
     def calculate_the_network(self):
         
-        # global pipes_table
-        # global pumps_table
-        # global channels_table
+        global pipes_table
+        global pumps_table
+        global channels_table
 
         # pipes_table, pumps_table, channels_table = autocad_analyzing.dwg_objects_sorting()
         pipes_table, pumps_table, channels_table = sort_objects()

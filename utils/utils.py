@@ -20,19 +20,12 @@ def update_text_config(max_distance):
     max_text_size = Config.MAX_TEXT_SIZE
     min_distance = Config.MIN_DISTANCE
     max_allowed_distance = Config.MAX_ALLOWED_DISTANCE
-    # min_text_size = 2.5
-    # max_text_size = 20
-    # min_distance = 100
-    # max_allowed_distance = 10000
 
     clamped_distance = max(min_distance, min(max_distance, max_allowed_distance))
     normalized_distance = math.log(clamped_distance) / math.log(max_allowed_distance)
 
     Config.TEXT_SIZE = round(min_text_size + (max_text_size - min_text_size) * normalized_distance, 1)
-    
-    min_padding = 2
-    max_padding = 8
-    Config.PADDING = round(min_padding + (max_padding - min_padding) * normalized_distance, 1)
+    Config.PADDING = Config.TEXT_SIZE +2 
 
     min_margin = 30
     max_margin = 120
