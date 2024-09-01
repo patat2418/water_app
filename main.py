@@ -21,6 +21,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 # import json , glob, random
 from datetime import datetime
 from pathlib import Path
+
+from utils.autocad.analyzing.sort_objects import sort_objects
 # import eq
 
 sys.path.insert(1,os.getcwd())
@@ -28,6 +30,9 @@ from utils import eq
 from utils import useful_functions as usf
 from entities import entities
 from utils.autocad import autocad_functions,pipes_network_sytems,autocad_analyzing
+from utils.autocad.autocad_analyzing import acad
+from utils.autocad.add_objects.add_text import add_text_to_dwg
+
 
 Builder.load_file('design.kv')
 pipes_table = pd.DataFrame()
@@ -117,15 +122,18 @@ class NetworkWidget(Screen):
 
     def calculate_the_network(self):
         
-        global pipes_table
-        global pumps_table
-        global channels_table
+        # global pipes_table
+        # global pumps_table
+        # global channels_table
 
-        pipes_table, pumps_table, channels_table = autocad_analyzing.dwg_objects_sorting()
+        # pipes_table, pumps_table, channels_table = autocad_analyzing.dwg_objects_sorting()
+        pipes_table, pumps_table, channels_table = sort_objects()
         autocad_analyzing.is_pipe_conected(pipes_table,pumps_table)
+
         if not pipes_table.empty: 
-            pipes_network_sytems.simple_network(pipes_table,pumps_table)
-        autocad_analyzing.add_text_to_dwg(pipes_table,pumps_table, channels_table)
+            pipes_network_sytems.branched_network(pipes_table,pumps_table)
+            # pipes_network_sytems.simple_network(pipes_table,pumps_table)
+        add_text_to_dwg(pipes_table,pumps_table, channels_table)
         
         # self.make_a_sec()
 
@@ -140,27 +148,30 @@ class NetworkWidget(Screen):
         try:
             eco_pipes_table, eco_pumps_table, channels_table = autocad_analyzing.dwg_objects_sorting()
             autocad_analyzing.is_pipe_conected(eco_pipes_table,eco_pumps_table)
-            pipes_network_sytems.simple_network(eco_pipes_table,eco_pumps_table) #Need diffrent func
+            pipes_network_sytems.branched_network(eco_pipes_table,eco_pumps_table) #Need diffrent func
             pipes_network_sytems.pipes_from_flow_and_velocity (eco_pipes_table, eco_pumps_table, float(velocity))
-            autocad_analyzing.add_text_to_dwg(eco_pipes_table,eco_pumps_table,channels_table)
+            add_text_to_dwg(eco_pipes_table,eco_pumps_table,channels_table)
         except Exception as e:
             print (f'error: {e}')
 
 
     def save_to_excel(self):
-        with pd.ExcelWriter('data\\outputs\\acad-pipelines.xlsx') as writer:
+        try:
+            with pd.ExcelWriter('data\\outputs\\acad-pipelines.xlsx') as writer:
 
-            pipes_table.to_excel(writer,sheet_name='Pipes',index=False)
+                pipes_table.to_excel(writer,sheet_name='Pipes',index=False)
+                
+                pumps_table.to_excel(writer,sheet_name='Pumps',index=False)
+
+                eco_pipes_table.to_excel(writer,sheet_name='eco Pipes',index=False)
+                
+                eco_pumps_table.to_excel(writer,sheet_name='eco Pumps',index=False)
+
+                channels_table.to_excel(writer,sheet_name='Channels',index=False)
             
-            pumps_table.to_excel(writer,sheet_name='Pumps',index=False)
-
-            eco_pipes_table.to_excel(writer,sheet_name='eco Pipes',index=False)
-            
-            eco_pumps_table.to_excel(writer,sheet_name='eco Pumps',index=False)
-
-            channels_table.to_excel(writer,sheet_name='Channels',index=False)
-        
-        os.startfile('data\\outputs\\acad-pipelines.xlsx')
+            os.startfile('data\\outputs\\acad-pipelines.xlsx')
+        except Exception as e:
+            print(e)
         # print('file saved')
 
     # def open_calculator(self):

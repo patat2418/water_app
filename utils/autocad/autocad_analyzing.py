@@ -1,15 +1,17 @@
 import sys
 import os
-from pyautocad import Autocad, APoint, aDouble
+from pyautocad import Autocad, APoint
 from math import *
 import pandas as pd
 import win32com.client
 import re
+
+# from utils.autocad.add_objects.add_text import add_channels_text, add_pipes_text, add_pumps_text
 sys.path.insert(1,os.getcwd())
 from utils import eq
 from utils import useful_functions as uf
 from entities import entities
-from utils.autocad import autocad_functions
+from utils.autocad import pipes_network_sytems
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -34,11 +36,24 @@ pipe_text_layer.color = 7
 energy_line_layer.color = 6
 pump_text_layer.color = 7
 pump_text_layer.color = 7
-channel_text_layer.color = 5
+channel_text_layer.color = 7
 channel_layer.color = 38
 channel_water_layer.color = 5
 channel_max_water_layer.color = 4
 
+layers_dict = {
+    "grid_layer" : grid_layer,
+    "grid_text_layer" : grid_text_layer,
+    "pipe_layer" : pipe_layer,
+    "pipe_guideline_layer" : pipe_guideline_layer,
+    "pipe_text_layer" : pipe_text_layer,
+    "energy_line_layer" : energy_line_layer,
+    "pump_text_layer" : pump_text_layer,
+    "channel_text_layer" : channel_text_layer,
+    "channel_layer" : channel_layer,
+    "channel_water_layer" : channel_water_layer,
+    "channel_max_water_layer" : channel_max_water_layer,
+}
 
 def dwg_objects_sorting():
     '''
@@ -57,9 +72,7 @@ def dwg_objects_sorting():
                                         'manning coeficent','flow' ,'velocity', 'water depth', 'max flow rates', 'max water depth',
                                         'geometry: bottom width','geometry: bank slope', 'geometry: channel depth', 'geometry: channel width', 
                                         'geometry: free board', 'start with', 'end with'])
-    # channels_table = pd.DataFrame(columns=['Consumer #', 'Consumption', 'Min pressure' ])
-
-
+    
     for obj in acad.iter_objects_fast():
 
         if obj.ObjectName == "AcDbLine":
@@ -84,12 +97,12 @@ def dwg_objects_sorting():
                 k += 1
                 # print(channel_name)
                 try:
-                    bank_slope = float(re.search(r'(?:[_])m-(\d+)',obj.Layer).group(1))
+                    bank_slope = float(re.search(r'(?:[_])m-(\d*\.*\d+)',obj.Layer).group(1))
                 except:
                     #Create default values - rectangle channel
                     bank_slope = 0
                 try:
-                    bottom_width = float(re.search(r'(?:[_])b-(\d+)',obj.Layer).group(1))
+                    bottom_width = float(re.search(r'(?:[_])b-(\d*\.*\d+)',obj.Layer).group(1))
                 except:
                     #Create default values - Triangle channel
                     bottom_width = 0
@@ -167,10 +180,10 @@ def dwg_objects_sorting():
                     nominal_diameter = float(re.search(r'(?:[_])nd-(\d*\.*\d+)',obj.Layer).group(1))
                 except:
                     raise TypeError("Nominal diameter is requierd!")
-                try:
-                    consumption = float(re.search(r'(?:[_])dn-(\d*\.*\d+)',obj.Layer).group(1))
-                except:
-                    consumption = 0
+                # try:
+                #     consumption = float(re.search(r'(?:[_])dn-(\d*\.*\d+)',obj.Layer).group(1))
+                # except:
+                #     consumption = 0
                 try:
                     consumption = float(re.search(r'(?:[_])flow-(\d*\.*\d+)',obj.Layer).group(1))
                 except:
@@ -242,278 +255,11 @@ def is_pipe_conected(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame):
             end_with_pipe_name = ', '.join(i_end_with['pipe #'])
             pipes_table['end with'].iloc[i] = end_with_pipe_name
     
-def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channels_table: pd.DataFrame):
-    
-    ### Channel writing info:
-    acad.ActiveDocument.ActiveLayer = channel_text_layer
-    for i in range(len(channels_table)):
+# def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channels_table: pd.DataFrame):
 
-        p1 = APoint(channels_table['start'][i])
-        p2 = APoint(channels_table['end'][i])
-
-        p3 = APoint(uf.midpoint_betwen_to_points(p2,p1))
-        
-        #Vertex text
-        vertex_text1 = f'Vertex number: {i+1}'
-        vertex_text2 = f'Z={p1.z}'
-
-        text = acad.model.Addtext(vertex_text1,p1,2.5)
-        p1.y -= 4
-        text = acad.model.Addtext(vertex_text2,p1,2.5)
-
-        if i == (len(channels_table)-1):
-            
-            p4 = APoint(channels_table['end'][i])
-            vertex_text1 = f'Vertex number: {i+2}'
-            vertex_text2 = f'Z={p4.z}'
-            
-            text = acad.model.Addtext(vertex_text1,p4,2.5)
-            p4.y -= 4
-            text = acad.model.Addtext(vertex_text2,p4,2.5)
-
-        #Channel text
-        p3.y += 80
-
-        channel_name = str(channels_table['channel #'][i])
-        text = acad.model.Addtext(channel_name,p3,2.5)
-        p3.y -= 4
-
-        length = f"length: {round(channels_table['length (m)'][i],2)} m"
-        text = acad.model.Addtext(length,p3,2.5)
-        p3.y -= 4
-
-        slope = f"slope: {round(float(channels_table['slope'][i]*100),2)} %"
-        text = acad.model.Addtext(slope,p3,2.5)
-        p3.y -= 4
-
-        des_flow = f"the water level will be: {round(float(channels_table['water depth'][i]*100),2)} cm @ design flow rate {round(float(channels_table['flow'][i]),2)}"
-        text = acad.model.Addtext(des_flow,p3,2.5)
-        p3.y -= 4
-
-        if channels_table['max water depth'][i]:
-            max_flow = f"the max allowed water level is: {round(float(channels_table['max water depth'][i]*100),2)} cm @ flow rate {round(float(channels_table['max flow rates'][i]),2)}"
-            text = acad.model.Addtext(max_flow,p3,2.5)
-            p3.y -= 4
-
-        # Channel sec
-        ### data ###
-        bottom_width = channels_table['geometry: bottom width'][i]*100
-        bank_slope = channels_table['geometry: bank slope'][i]
-        water_depth = channels_table['water depth'][i]*100
-        flow_rate = channels_table['flow'][i]
-        free_board =  channels_table['geometry: free board'][i]*100
-        channel_depth = channels_table['geometry: channel depth'][i]*100
-        max_water_depth = channels_table['max water depth'][i]*100
-        max_flow_rate = channels_table['max flow rates'][i]
-
-        try:
-            channel_depth = float(channel_depth)
-        except:
-            try:
-                    if max_water_depth:
-                            channel_depth = float (max_water_depth)+float(free_board)
-
-                    else:
-                            channel_depth = float(channel_depth)
-            except:
-                    channel_depth = float (water_depth)+free_board
-        
-        side_steps = (channel_depth/100)*float(bank_slope)*100 
-        water_side_steps = (water_depth/100)*float(bank_slope)*100
-        max_water_side_steps = ((max_water_depth/100)*float(bank_slope))*100
-        
-        ############ Draw sec
-
-        acad.ActiveDocument.ActiveLayer = channel_layer
-        
-        ps = APoint(channels_table['start'][i])
-        pe = APoint(channels_table['end'][i])
-        p3 = APoint(uf.midpoint_betwen_to_points(pe,ps))
-
-        p3.y += 100 #Set (0,0) of section
-        p3.z = 0
-
-        p2 = APoint((p3.x - side_steps),(p3.y + channel_depth))
-        p1 = APoint((p2.x-100), p2.y)
-        
-        if bottom_width != 0:
-            p4 = APoint((p3.x + bottom_width),p3.y)
-            p5 = APoint((p4.x + side_steps),(p4.y + channel_depth))
-            p6 = APoint((p5.x+100),p5.y)
-            p7 = APoint((p4.x + water_side_steps), (p4.y + water_depth))
-            p8 = APoint((p4.x + max_water_side_steps), (p4.y + max_water_depth))
-        else:
-            p4 = APoint((p3.x + side_steps),(p3.y + channel_depth))
-            p5 = APoint((p4.x+100),p4.y)
-            p6 = p5
-            p7 = APoint((p3.x + water_side_steps), (p3.y + water_depth))
-            p8 = APoint((p3.x + max_water_side_steps), (p3.y + max_water_depth))
-
-
-        acad.model.AddLine(p1,p2)
-        acad.model.AddLine(p2,p3)
-        acad.model.AddLine(p3,p4)
-        acad.model.AddLine(p4,p5)
-        acad.model.AddLine(p5,p6)
-
-        ############ Draw water levels
-
-        acad.ActiveDocument.ActiveLayer = channel_water_layer
-        
-        p9 = APoint((p3.x - water_side_steps),(p3.y + water_depth))
-        water_line = acad.model.AddLine(p7,p9)
-        water_text_point = APoint(uf.midpoint_betwen_to_points(p7,p9))
-        water_text_point.x -= 50
-        des_flow = f"the water level will be: {round(water_depth,2)} cm @ design flow rate {round(flow_rate,2)}"
-        text = acad.model.Addtext(des_flow,water_text_point,2.5)
-
-        if max_water_depth:
-                acad.ActiveDocument.ActiveLayer = channel_max_water_layer
-                p10 = APoint((p3.x - max_water_side_steps),(p3.y + max_water_depth))
-                max_water_line = acad.model.AddLine(p8,p10)
-                max_water_text_point = APoint(uf.midpoint_betwen_to_points(p8,p10))
-                max_water_text_point.x -= 50
-                max_flow = f"the maximum allowed water level is: {round(max_water_depth,2)} cm @ Max flow rate of {round(max_flow_rate,2)}"
-                text = acad.model.Addtext(max_flow,max_water_text_point,2.5)
-
-                if (max_water_depth < water_depth):
-                    
-                    max_water_text_point.y -= 10
-                    max_water_text_point.x -= 50
-                    bad_geometry_text ='Channel Geometry is not good for the designed water flow'
-                    text1 = acad.model.Addtext(bad_geometry_text,max_water_text_point,5)
-                    text1.color = 1
-
-    ### Pump writing info:
-    # acad.ActiveDocument.ActiveLayer = pump_text_layer
-    for i in range(len(pumps_table)):
-        
-        # print(float_tuple_from_excel( pumps_table['center'][i]))
-        acad.ActiveDocument.ActiveLayer = pipe_text_layer
-        p1 = APoint(pumps_table['center'][i])
-        p1.y += 30
-        pump_name = str(pumps_table['pump #'][i])
-        text = acad.model.Addtext(pump_name,p1,2.5)
-        
-        p1.y -= 4
-        flow = f"flow: {pumps_table['flow'][i]} m^3/hr"
-        text = acad.model.Addtext(flow,p1,2.5)
-
-        p1.y -= 4
-        head = f"head: {round(pumps_table['head'][i],2)} m"
-        text = acad.model.Addtext(head,p1,2.5)
-
-### Pipe writing info:
-        
-    acad.ActiveDocument.ActiveLayer = pipe_text_layer
-    pump_name = 'Pump 1'
-    prev_pipe = pipes_table[pipes_table['start with'] == pump_name]['start with'].values[0]
-    current_pipe = pipes_table[pipes_table['start with'] == pump_name]['pipe #'].values[0]
-    next_pipe = pipes_table[pipes_table['start with'] == pump_name]['end with'].values[0]
-    
-    for i in range(len(pipes_table)): #range(len(pipes_table))
-
-        ####### Vertex text #####
-        p1 = APoint(pipes_table.loc[current_pipe,'start']) # p1 = APoint(pipes_table['start'][i])
-
-        if i == 0:
-            pressure = pumps_table.loc[pump_name,"head"]
-            min_pressure = 0
-            consumption = 0
-        else:
-            pressure = pipes_table.loc[prev_pipe,"Pressure at end of pipe"]
-            min_pressure = pipes_table.loc[prev_pipe,"minimum pressure required"]
-            consumption = pipes_table.loc[prev_pipe,"consumption"]
-             
-        
-        vertex_text1 = f'Vertex number: {i+1}'
-        vertex_text2 = f'Z={p1.z}'
-        vertex_text3 = f'P={round(pressure,2)}'
-        vertex_text4 = f'H={round(p1.z + pressure,2)}'
-        vertex_text5 = f'Consumption = {consumption}'
-        vertex_text6 = f'Minimum pressure at vertex = {min_pressure}'
-
-        text = acad.model.Addtext(vertex_text1,p1,2.5)
-        p1.y -= 4
-        text = acad.model.Addtext(vertex_text2,p1,2.5)
-        p1.y -= 4
-        text = acad.model.Addtext(vertex_text3,p1,2.5)
-        p1.y -= 4
-        text = acad.model.Addtext(vertex_text4,p1,2.5)
-        p1.y -= 4
-        text = acad.model.Addtext(vertex_text5,p1,2.5)
-        p1.y -= 4
-        text = acad.model.Addtext(vertex_text6,p1,2.5)
-
-        if i == (len(pipes_table)-1):
-            p4 = APoint(pipes_table.loc[current_pipe,'end'])
-            pressure = pipes_table.loc[current_pipe,"Pressure at end of pipe"]
-            min_pressure = pipes_table.loc[prev_pipe,"minimum pressure required"]
-            consumption = pipes_table.loc[current_pipe,"consumption"]
-            
-            vertex_text1 = f'Vertex number: {i+2}'
-            vertex_text2 = f'Z={p4.z}'
-            vertex_text3 = f'P={round(pressure ,2)}'
-            vertex_text4 = f'H={round(p1.z + pressure,2)}'
-            vertex_text5 = f'consumption = {consumption}'
-            vertex_text6 = f'Minimum pressure at vertex = {min_pressure}'
-            
-            text = acad.model.Addtext(vertex_text1,p4,2.5)
-            p4.y -= 4
-            text = acad.model.Addtext(vertex_text2,p4,2.5)
-            p4.y -= 4
-            text = acad.model.Addtext(vertex_text3,p4,2.5)
-            p4.y -= 4
-            text = acad.model.Addtext(vertex_text4,p4,2.5)
-            p4.y -= 4
-            text = acad.model.Addtext(vertex_text5,p4,2.5)
-
-#         print(f''' ################################################################
-#                i={i} from {len(pipes_table)};
-#                vertex number = {vertex_text1};
-#                pressure = {pressure};
-#                consumption = {consumption};
-#                current_pipe = {current_pipe};
-#                next_pipe = {next_pipe};
-#  ''')
-#         input("press any key: ")
-        prev_pipe = current_pipe
-        current_pipe = next_pipe
-        try: 
-            next_pipe = (pipes_table[pipes_table['pipe #'] == current_pipe]['end with'].values[0])
-        except:
-            next_pipe = ''
-
-
-        p2 = APoint(pipes_table['end'][i])
-        p3 = APoint(uf.midpoint_betwen_to_points(p2,p1))
-        
-        p3.y += 80
-
-        pipe_name = str(pipes_table['pipe #'][i])
-        text = acad.model.Addtext(pipe_name,p3,2.5)
-        
-        p3.y -= 4
-        
-        if pipes_table['pipe type'][i] == 'Steel':
-            units = '"'
-        else:
-            units = 'mm'
-
-        pipe_type = f"{pipes_table['pipe type'][i]} %%C {pipes_table['nominal dia'][i]} {units}"
-        text = acad.model.Addtext(pipe_type,p3,2.5)
-        
-        p3.y -= 4
-        length = f"length: {round(pipes_table['length (m)'][i],2)} m"
-        text = acad.model.Addtext(length,p3,2.5)
-
-        p3.y -= 4
-        flow = f"flow: {pipes_table['flow'][i]} m^3/hr"
-        text = acad.model.Addtext(flow,p3,2.5)
-
-        p3.y -= 4
-        flow = f"Total head loss: {round(pipes_table['total head loss'][i],2)} m"
-        text = acad.model.Addtext(flow,p3,2.5)
+#     add_channels_text(acad, channels_table, layers_dict)
+#     add_pipes_text(acad, pipes_table, layers_dict)
+#     add_pumps_text(acad, pumps_table, layers_dict)
 
 def make_a_sec_grid (pipes_table, x_steps, y_steps):
     
@@ -650,6 +396,7 @@ def draw_pipe_sec ( pipes_table,min_y,max_y):
 
 if __name__=='__main__':
 
+    from utils.autocad import pipes_network_sytems
 
     pipes_table = pd.DataFrame()
     pumps_table = pd.DataFrame()
@@ -658,6 +405,60 @@ if __name__=='__main__':
     pipes_table, pumps_table, channels_table = dwg_objects_sorting()
     is_pipe_conected(pipes_table,pumps_table)
 
+    ###### pump restart
+    pump_number = pumps_table['pump #'][0]
+    pump_flow = pipes_table['consumption'].sum()  
+    pumps_table['flow'][pump_number] = pump_flow
+    pump1 = entities.Pump(rated_flow=pump_flow)
+
+    
+    ### Pipes data ###
+    
+    junctions_list= list(pipes_table[pipes_table['end with'].str.contains(',', na=False)]['pipe #'])
+        
+    for junction in junctions_list:
+        
+        pass
+
+    previous_pipe_number = 0
+
+    
+
+    for pipe in range(0,len(pipes_table.index)):
+
+        if pipe == 0:
+            new_pipe_number = pipes_table[pipes_table['start with'] == pump_number]['end with'].index[0]
+            flow_rate = pump_flow
+ 
+        else:
+            new_pipe_number = pipes_table['end with'][previous_pipe_number]
+            flow_in = float(pipes_table['flow'][previous_pipe_number])
+            consumption = float(pipes_table['consumption'][previous_pipe_number])
+            flow_rate = flow_in - consumption
+
+        # if new_pipe_number
+
+        pipetype = pipes_table['pipe type'][new_pipe_number]
+        nominal_dia = pipes_table['nominal dia'][new_pipe_number]
+        inside_dia = pipes_table['id (mm)'][new_pipe_number]
+        length = pipes_table['length (m)'][new_pipe_number]
+        static_head = pipes_table['static head (endZ-startZ)'][new_pipe_number]
+    
+        pipe1 = entities.Pipe(pipetype=pipetype,nominal_dia=nominal_dia,inside_dia=inside_dia,length=length,static_head=static_head,flow_rate=flow_rate)
+
+        velocity = pipe1.velocity()
+        head_loss = pipe1.major_head_loss()
+        total_headloss = pipe1.total_head_loss()
+
+        pipes_table['flow'][new_pipe_number] = flow_rate 
+        pipes_table['velocity'][new_pipe_number] = velocity
+        pipes_table['head loss'][new_pipe_number] = head_loss
+        pipes_table['total head loss'][new_pipe_number] = total_headloss
+
+        previous_pipe_number = new_pipe_number
+    
+    minimum_pressure = pipes_network_sytems.add_pressure_at_end_of_pipe(pipes_table)
+
     with pd.ExcelWriter('data\\outputs\\acad-pipelines.xlsx') as writer:
         pipes_table.to_excel(writer,sheet_name='Pipes',index=False)
         pumps_table.to_excel(writer,sheet_name='Pumps',index=False)
@@ -665,7 +466,71 @@ if __name__=='__main__':
     os.startfile('data\\outputs\\acad-pipelines.xlsx')    
 
 
-# acad = Autocad(create_if_not_exists=True)
-# pipes_table, pumps_table = dwg_objects_sorting(acad=acad)
 
-# print(pumps_table)
+if __name__=='__main__':
+    import re
+    pipes_table = pd.DataFrame()
+    pumps_table = pd.DataFrame()
+    channels_table = pd.DataFrame()
+    eco_pipes_table = pipes_table.copy()
+    eco_pumps_table = pumps_table.copy()
+
+    acad = Autocad(create_if_not_exists=True)
+    
+    k = 0 
+
+    for obj in acad.iter_objects_fast():
+
+        if obj.ObjectName == "AcDbLine":
+
+            ##### Channels data: #####
+                
+            if obj.Layer.startswith('Channel_'):
+                '''
+                Layer template:
+                m = bank slope
+                b = bottom width
+                n = manning coefficient
+                q = flow rate
+                mwd = Max Water Depth allowed
+                cd = desgined Channel Depth
+                fb = Free board
+
+                '''
+                
+                
+                channel_name = 'Channel '+ str(k+1)
+                k += 1
+    # Define simplified patterns and default values in a dictionary
+                patterns = {
+                    'bank_slope': {'pattern': r'm-', 'default': 0},
+                    'bottom_width': {'pattern': r'b-', 'default': 0},
+                    'max_water_depth': {'pattern': r'mwd-', 'default': False},
+                    'flow_rate': {'pattern': r'q-', 'default': 0},
+                    'manning_coefficient': {'pattern': r'n-', 'default': 0.035},
+                    'channel_depth': {'pattern': r'cd-', 'default': ""},
+                    'free_board': {'pattern': r'fb-', 'default': 0.25}
+                }
+
+                # Function to extract values from obj.Layer using the provided pattern
+                def extract_value(pattern, obj):
+                    search_pattern = rf'(?:[_]){pattern}(\d*\.*\d+)'
+                    try:
+                        return float(re.search(search_pattern, obj.Layer).group(1))
+                    except:
+                        return patterns[pattern]['default']
+
+                # Create a dictionary to store the extracted values
+                extracted_values = {}
+
+                # Loop through patterns and extract values
+                for key, value in patterns.items():
+                    extracted_value = extract_value(value['pattern'], obj)
+                    if key == 'channel_depth':
+                        print(f"Channel depth {extracted_value}")
+                    # Store the extracted value in the dictionary
+                    extracted_values[key] = extracted_value
+            #     pipes_table, pumps_table = dwg_objects_sorting(acad=acad)
+    print(extracted_value)
+
+            # # print(pumps_table)

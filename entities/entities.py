@@ -69,7 +69,7 @@ class Pipe:
         Returns:
             velocity(float): the vleocity in m/s
         """
-        print(float(self.flow_rate))
+        # print(float(self.flow_rate))
         return (float(self.flow_rate)/3600)/(self.area())
 
     def flow_rate_calc(self,velocity=0):

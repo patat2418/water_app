@@ -1,0 +1,277 @@
+#:kivy 2.0.0
+#:import MDScreen kivymd.uix.screen.MDScreen
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+#:import MDCard kivymd.uix.card.MDCard
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDRaisedButton kivymd.uix.button.MDRaisedButton
+#:import MDSpinner kivymd.uix.spinner.MDSpinner
+#:import ScrollView kivy.uix.scrollview.ScrollView
+#:import MDFillRoundFlatButton kivymd.uix.button.MDFillRoundFlatButton
+
+<WelcomeScreen>:
+    MDScreen:
+        md_bg_color: app.theme_cls.bg_dark if app.theme_cls.theme_style == "Dark" else app.theme_cls.bg_light
+
+        ScrollView:
+            MDBoxLayout:
+                orientation: "vertical"
+                padding: "10dp"
+                spacing: "10dp"
+                size_hint_y: None
+                height: self.minimum_height
+
+                MDCard:
+                    orientation: "vertical"
+                    padding: "20dp"
+                    size_hint: 1, None
+                    height: self.minimum_height
+                    md_bg_color: app.theme_cls.bg_normal
+
+                    MDLabel:
+                        text: "Water Network App"
+                        halign: "center"
+                        font_style: "H4"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        theme_text_color: "Custom"
+                        text_color: app.theme_cls.primary_color
+
+                    MDGridLayout:
+                        cols: 2
+                        spacing: "15dp"
+                        size_hint_y: None
+                        height: self.minimum_height
+
+                        MDLabel:
+                            text: "Pipe type:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDSpinner:
+                            id: pipe_type
+                            text: "Select pipe type"
+                            values: ["Steel", "PE100-16", "PE100-12.5", "PE100-10"]
+                            size_hint_x: 1
+
+                        MDLabel:
+                            text: "Nominal diameter:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDSpinner:
+                            id: nominal_diameter
+                            text: "Select diameter"
+                            size_hint_x: 1
+
+                        MDLabel:
+                            text: "Consumption [m³/hr]:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDTextField:
+                            id: consumption
+                            hint_text: "consumption"
+                            input_filter: "float"
+                            size_hint_x: 1
+
+                        MDLabel:
+                            text: "Min pressure [m]:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDTextField:
+                            id: min_pressure
+                            hint_text: "min pressure"
+                            input_filter: "float"
+                            size_hint_x: 1
+
+                        MDLabel:
+                            text: "Start elevation:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDTextField:
+                            id: start_elevation
+                            hint_text: "start elevation (from dwg)"
+                            input_filter: "float"
+                            size_hint_x: 1
+
+                        MDLabel:
+                            text: "End elevation:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDTextField:
+                            id: end_elevation
+                            hint_text: "end elevation (from dwg)"
+                            input_filter: "float"
+                            size_hint_x: 1
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        spacing: "10dp"
+                        size_hint_y: None
+                        height: "48dp"
+
+                        MDRaisedButton:
+                            text: "Select a Pipe"
+                            md_bg_color: [0.2, 0.3, 0.8, 1]
+                            on_release: 
+                                root.create_a_pipe(pipe_type.text, nominal_diameter.text, consumption.text, min_pressure.text)
+                                root.log_area.text += f"Selected pipe: {pipe_type.text}, {nominal_diameter.text}, Consumption: {consumption.text}, Min Pressure: {min_pressure.text}\n"
+
+                        MDRaisedButton:
+                            text: "Draw a Pipe"
+                            md_bg_color: [0.2, 0.3, 0.8, 1]
+                            on_release: 
+                                root.draw_a_pipe(pipe_type.text, nominal_diameter.text, start_elevation.text, end_elevation.text, consumption.text, min_pressure.text)
+                                root.log_area.text += f"Drew pipe: {pipe_type.text}, {nominal_diameter.text}, Start Elevation: {start_elevation.text}, End Elevation: {end_elevation.text}, Consumption: {consumption.text}, Min Pressure: {min_pressure.text}\n"
+
+                MDCard:
+                    orientation: "vertical"
+                    padding: "20dp"
+                    size_hint: 1, None
+                    height: self.minimum_height
+                    md_bg_color: app.theme_cls.bg_light
+
+                    MDLabel:
+                        text: "Add Pump"
+                        halign: "center"
+                        font_style: "H5"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+
+                    MDGridLayout:
+                        cols: 2
+                        spacing: "15dp"
+                        size_hint_y: None
+                        height: self.minimum_height
+
+                        MDLabel:
+                            text: "Efficiency [%]:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDTextField:
+                            id: efficiency
+                            hint_text: "efficiency (default value = 0.75)"
+                            input_filter: "float"
+                            size_hint_x: 1
+
+                        MDLabel:
+                            text: "Starts per hour:"
+                            size_hint_x: None
+                            width: "150dp"
+                        MDTextField:
+                            id: starts_per_hour
+                            hint_text: "starts per hour"
+                            input_filter: "int"
+                            size_hint_x: 1
+
+                    MDRaisedButton:
+                        text: "Select a Pump"
+                        md_bg_color: [0.2, 0.3, 0.8, 1]
+                        size_hint: 1, None
+                        height: "48dp"
+                        on_release: 
+                            root.create_a_pump(efficiency.text, starts_per_hour.text)
+                            root.log_area.text += f"Selected pump with efficiency {efficiency.text} and starts per hour {starts_per_hour.text}\n"
+
+            MDCard:
+                orientation: "vertical"
+                padding: "20dp"
+                size_hint: 1, None
+                height: self.minimum_height
+                md_bg_color: app.theme_cls.bg_light
+
+                MDLabel:
+                    text: "Network Operations"
+                    halign: "center"
+                    font_style: "H5"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDGridLayout:
+                    cols: 3
+                    spacing: "15dp"
+                    size_hint_y: None
+                    height: self.minimum_height
+
+                    MDRaisedButton:
+                        text: "Calculate network"
+                        md_bg_color: [0.2, 0.3, 0.8, 1]
+                        size_hint: 1, None
+                        height: "48dp"
+                        on_release: 
+                            root.calculate_the_network()
+                            root.log_area.text += "Network calculation initiated.\n"
+
+                    MDLabel:
+                        text: "Max velocity:"
+                        size_hint_x: None
+                        width: "150dp"
+                    MDTextField:
+                        id: max_velocity
+                        hint_text: "m/s"
+                        size_hint_x: 1
+                        size_hint_y: None
+                        height: "48dp"
+
+                    MDRaisedButton:
+                        text: "Optimize"
+                        md_bg_color: [0.2, 0.3, 0.8, 1]
+                        size_hint: 1, None
+                        height: "48dp"
+                        on_release: 
+                            root.calculate_with_max_velocity(max_velocity.text)
+                            root.log_area.text += f"Optimization with max velocity {max_velocity.text} initiated.\n"
+
+                MDBoxLayout:
+                    orientation: "horizontal"
+                    spacing: "15dp"
+                    size_hint_y: None
+                    height: "48dp"
+
+                    MDRaisedButton:
+                        text: "Create Pipe section"
+                        md_bg_color: [0.2, 0.3, 0.8, 1]
+                        on_release: 
+                            root.make_a_sec()
+                            root.log_area.text += "Pipe section created.\n"
+
+                    MDRaisedButton:
+                        text: "Save to Excel"
+                        md_bg_color: [0.2, 0.3, 0.8, 1]
+                        on_release: 
+                            root.save_to_excel()
+                            root.log_area.text += "Data saved to Excel.\n"
+
+                    MDRaisedButton:
+                        text: "Open calculator"
+                        md_bg_color: [0.2, 0.3, 0.8, 1]
+                        on_release: 
+                            root.open_calculator()
+                            root.log_area.text += "Calculator opened.\n"
+
+            MDCard:
+                orientation: "vertical"
+                padding: "20dp"
+                size_hint: 1, None
+                height: self.minimum_height
+                md_bg_color: app.theme_cls.bg_light
+
+                MDLabel:
+                    text: "System Logs"
+                    halign: "center"
+                    font_style: "H5"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                ScrollView:
+                    MDLabel:
+                        id: log_area
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        text: ""
+                        halign: "left"
+                        font_size: "12sp"
+                        theme_text_color: "Custom"
+                        text_color: app.theme_cls.primary_color
+
+<RootWidget>:
+    WidgetScreen:
+        name: 'widget_screen'

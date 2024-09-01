@@ -77,7 +77,9 @@ def draw_a_pipe_from_app(pipetype:str, nd:int, consumption='0',min_pressure='0',
         pass
 
     new_pipe = acad.model.AddLine(start,end)
+    
     new_pipe.Layer = layer_name
+    new_pipe.color = 4
 
 def make_a_pump_from_app(efficiency:str, starts_per_hour:str):
 
@@ -90,7 +92,9 @@ def make_a_pump_from_app(efficiency:str, starts_per_hour:str):
     for obj in acad.get_selection("please select new pump:"):
         
         layer_name = create_layer(efficiency, starts_per_hour)
+
         obj.Layer = layer_name
+        
 
 
 def make_a_pipe(pipe_name: str ): ## _from_prompt
