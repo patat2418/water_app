@@ -51,7 +51,7 @@ def make_a_pipe_from_app(pipetype:str, nd:int, consumption='0', min_pressure='0'
         layer_name = create_a_pipe_layer(pipetype, nd, consumption, min_pressure)
         obj.Layer = layer_name
 
-def draw_a_pipe_from_app(pipetype:str, nd:int, consumption='0',min_pressure='0', start_elv="" ,end_elv=""):
+def draw_a_pipe_from_app(pipetype:str, nd:int, consumption='0', start_elv="" ,end_elv="",min_pressure='0'):
 
     # def create_layer(pipetype:str, nd:str, consumption:str, min_pressure:str) -> str:
     #     '''Pipe_type-(Steel)_nd-20_flow-200_MPressure-20'''
