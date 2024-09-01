@@ -1,7 +1,7 @@
 import pandas as pd
 from pyautocad import Autocad, APoint, aDouble
 from utils.useful_functions import midpoint_betwen_to_points
-from config import config
+from config.config import Config
 import os, sys
 sys.path.insert(1,os.getcwd())
 from utils.autocad.autocad_analyzing import acad, layers_dict
@@ -102,20 +102,20 @@ def draw_channel_water(channel: pd.Series, channel_data: dict, water_points: APo
     p7,p8,p9,p10 = water_points
     water_line = acad.model.AddLine(p7,p9)
     water_text_point = APoint(midpoint_betwen_to_points(p7,p9))
-    water_text_point.x -= config.MARGIN
-    text = acad.model.Addtext(channel_data['des_flow'],water_text_point,config.TEXT_SIZE)
+    water_text_point.x -= Config.MARGIN
+    text = acad.model.Addtext(channel_data['des_flow'],water_text_point,Config.TEXT_SIZE)
 
     if channel_data['max_water_depth']:
         max_water_line = acad.model.AddLine(p8,p10)
         max_water_text_point = APoint(midpoint_betwen_to_points(p8,p10))
-        max_water_text_point.y -= config.PADDING
-        max_water_text_point.x -= config.MARGIN
-        text = acad.model.Addtext(channel_data['max_flow'],max_water_text_point,config.TEXT_SIZE)
+        max_water_text_point.y -= Config.PADDING
+        max_water_text_point.x -= Config.MARGIN
+        text = acad.model.Addtext(channel_data['max_flow'],max_water_text_point,Config.TEXT_SIZE)
 
         if (channel_data['max_water_depth'] < channel_data['water_depth']):
-            max_water_text_point.y -= config.PADDING*5
-            max_water_text_point.x -= config.MARGIN
-            text1 = acad.model.Addtext(channel_data['bad_geometry_text'],max_water_text_point,config.TEXT_SIZE*2)
+            max_water_text_point.y -= Config.PADDING*5
+            max_water_text_point.x -= Config.MARGIN
+            text1 = acad.model.Addtext(channel_data['bad_geometry_text'],max_water_text_point,Config.TEXT_SIZE*2)
             text1.color = 1
 
 def add_channel_section(channel: pd.Series):

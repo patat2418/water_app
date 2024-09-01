@@ -10,7 +10,7 @@ from utils.autocad import autocad_analyzing
 from utils.useful_functions  import midpoint_betwen_to_points
 from utils.autocad.pipes_network_sytems import branched_network
 from utils.utils import calculate_max_distance, calculate_text_size, update_text_config
-from config import config
+from config.config import Config
 # from utils.autocad.analyzing.sort_objects import sort_objects
 
 ### globals ###
@@ -26,8 +26,8 @@ def add_text_to_dwg(pipes_table: pd.DataFrame,pumps_table: pd.DataFrame, channel
 
 def add_text_to_cad(text_group:dict, p:APoint):
     for text in text_group.values():
-        text = acad.model.Addtext(text,p, config.TEXT_SIZE)
-        p.y -= config.TEXT_SIZE + config.PADDING 
+        text = acad.model.Addtext(text,p, Config.TEXT_SIZE)
+        p.y -= Config.TEXT_SIZE + Config.PADDING 
 ### Channels ###
 def add_channel_info_text(channel: pd.Series):
     
@@ -40,13 +40,13 @@ def add_channel_info_text(channel: pd.Series):
     }
 
     p = APoint(midpoint_betwen_to_points(channel['start'], channel['end']))
-    p.y -= config.MARGIN
+    p.y -= Config.MARGIN
 
     add_text_to_cad(channel_infos,p)
 
     if channel['max water depth']:
         max_flow = f"the max allowed water level is: {round(float(channel['max water depth']*100),2)} cm @ flow rate {round(float(channel['max flow rates']),2)}"
-        text = acad.model.Addtext(max_flow,p,config.TEXT_SIZE)
+        text = acad.model.Addtext(max_flow,p,Config.TEXT_SIZE)
 
 def add_channel_vertex_text(channel: pd.Series, i: int, channel_name: str, last_one_flag: bool ):
     
@@ -189,7 +189,7 @@ def add_pump_info_text(pump: pd.Series,pump_name:str) :
     }
 
     p = APoint(pump['center'])
-    p.y += config.MARGIN
+    p.y += Config.MARGIN
 
     add_text_to_cad(pump_info_text,p)
 
