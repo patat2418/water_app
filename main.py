@@ -152,7 +152,7 @@ class NetworkWidget(Screen):
             pipes_network_sytems.pipes_from_flow_and_velocity (eco_pipes_table, eco_pumps_table, float(velocity))
             add_text_to_dwg(eco_pipes_table,eco_pumps_table,channels_table)
         except Exception as e:
-            print (f'error: {e}')
+            print (f'Error: {e}')
 
 
     def save_to_excel(self):
