@@ -15,7 +15,7 @@ It combines AutoCAD drafting capabilities with complex hydraulic calculations an
 ## Installation
 1. Ensure you have Python 3.x installed
 2. Clone this repository:
-git clone https://github.com/yourusername/autocad-water-network-tool.git
+git clone https://github.com/patat2418/water_app.git
 Copy3. Install required dependencies:
 pip install -r requirements.txt
 Copy
